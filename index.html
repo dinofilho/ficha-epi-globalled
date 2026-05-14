@@ -5,133 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ficha Digital de EPI | GLOBALLED SST</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:linear-gradient(135deg,#031b1c,#062f31);
-color:white;
-padding:18px;
-}
-.container{
-max-width:950px;
-margin:auto;
-background:#061f21;
-padding:24px;
-border-radius:24px;
-box-shadow:0 0 30px rgba(0,255,180,.25);
-}
-.logo{
-display:block;
-margin:0 auto 15px;
-max-width:145px;
-border-radius:20px;
-background:#000;
-}
-h1{
-text-align:center;
-color:#00ffae;
-font-size:34px;
-}
-p{
-text-align:center;
-line-height:1.5;
-}
-.card{
-background:#082426;
-border:1px solid #16887d;
-border-radius:20px;
-padding:18px;
-margin-top:20px;
-}
-label{
-font-weight:bold;
-margin-top:13px;
-display:block;
-}
-input,select,textarea{
-width:100%;
-padding:15px;
-margin-top:7px;
-border:1px solid #16887d;
-border-radius:14px;
-background:#063638;
-color:white;
-font-size:16px;
-box-sizing:border-box;
-}
-textarea{
-min-height:130px;
-}
-button{
-width:100%;
-padding:17px;
-margin-top:16px;
-border:none;
-border-radius:14px;
-background:#009b68;
-color:white;
-font-size:18px;
-font-weight:bold;
-}
-.btn2{background:#004aad}
-.btn3{background:#8b0000}
-.epi{
-border:1px solid #16887d;
-padding:14px;
-border-radius:16px;
-margin-top:12px;
-background:#061b1d;
-}
-canvas{
-background:white;
-border-radius:12px;
-width:100%;
-height:160px;
-touch-action:none;
-}
-.pdf{
-background:white;
-color:#111;
-padding:26px;
-border-radius:12px;
-font-family:Arial,sans-serif;
-}
-.pdf h1,.pdf h2{
-color:#004d40;
-}
-.pdf-logo{
-max-width:110px;
-display:block;
-margin:0 auto 10px;
-}
-.small{
-font-size:12px;
-color:#333;
-}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#031b1c,#062f31);color:white;padding:18px}
+.container{max-width:950px;margin:auto;background:#061f21;padding:24px;border-radius:24px;box-shadow:0 0 30px rgba(0,255,180,.25)}
+.logo{display:block;margin:0 auto 15px;max-width:145px;border-radius:20px;background:#000}
+h1{text-align:center;color:#00ffae;font-size:34px}
+.card{background:#082426;border:1px solid #16887d;border-radius:20px;padding:18px;margin-top:20px}
+label{font-weight:bold;margin-top:13px;display:block}
+input,select,textarea{width:100%;padding:15px;margin-top:7px;border:1px solid #16887d;border-radius:14px;background:#063638;color:white;font-size:16px;box-sizing:border-box}
+textarea{min-height:130px}
+button{width:100%;padding:17px;margin-top:16px;border:none;border-radius:14px;background:#009b68;color:white;font-size:18px;font-weight:bold}
+.btn2{background:#004aad}.btn3{background:#8b0000}
+.epi{border:1px solid #16887d;padding:14px;border-radius:16px;margin-top:12px;background:#061b1d}
+canvas{background:white;border-radius:12px;width:100%;height:160px;touch-action:none}
+.pdf{background:white;color:#111;padding:26px;border-radius:12px;font-family:Arial,sans-serif}
+.pdf h1,.pdf h2{color:#004d40}
+.small{font-size:12px;color:#333}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-
 <img class="logo" src="https://globalledsst.com.br/img/logo.png" onerror="this.style.display='none'">
 
 <h1>FICHA DIGITAL DE ENTREGA DE EPI</h1>
-<p>Registro digital de entrega, ciência, responsabilidade, CA, validade e assinatura.</p>
+<p style="text-align:center">Registro digital de entrega, ciência, responsabilidade, CA, validade, assinatura e integração com painel GLOBALLED.</p>
 
 <div class="card">
-<h2>Dados da Empresa</h2>
+<h2>Cliente / Empresa</h2>
+<label>Selecionar cliente cadastrado</label>
+<select id="clienteSelect" onchange="preencherCliente()">
+<option value="">Selecione o cliente</option>
+</select>
 
 <label>Empresa</label>
 <input id="empresa" placeholder="Nome da empresa">
 
 <label>CNPJ</label>
-<input id="cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="mascaraCNPJ(this)">
+<input id="cnpj" placeholder="00.000.000/0000-00">
 
 <label>Unidade / Local</label>
 <input id="unidade" placeholder="Unidade ou local de trabalho">
@@ -139,18 +55,10 @@ color:#333;
 
 <div class="card">
 <h2>Dados do Colaborador</h2>
-
-<label>Colaborador</label>
-<input id="colaborador" placeholder="Nome completo">
-
-<label>CPF</label>
-<input id="cpf" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
-
-<label>Função</label>
-<input id="funcao" placeholder="Função">
-
-<label>Setor</label>
-<input id="setor" placeholder="Setor">
+<label>Colaborador</label><input id="colaborador" placeholder="Nome completo">
+<label>CPF</label><input id="cpf" placeholder="000.000.000-00">
+<label>Função</label><input id="funcao" placeholder="Função">
+<label>Setor</label><input id="setor" placeholder="Setor">
 </div>
 
 <div class="card">
@@ -161,11 +69,11 @@ color:#333;
 
 <div class="card">
 <h2>Termo de Responsabilidade</h2>
-<textarea id="termo">Declaro, para os devidos fins, que recebi da empresa os Equipamentos de Proteção Individual relacionados nesta ficha, em perfeito estado de conservação e funcionamento, conforme as necessidades da atividade exercida.
+<textarea id="termo">Declaro, para os devidos fins, que recebi da empresa os Equipamentos de Proteção Individual relacionados nesta ficha, em perfeito estado de conservação e funcionamento.
 
 Comprometo-me a utilizar os EPIs de forma correta e obrigatória durante a execução das atividades, zelar pela guarda e conservação, comunicar imediatamente qualquer dano, perda, defeito ou irregularidade, bem como solicitar a substituição quando necessário.
 
-Declaro ainda ter recebido orientação quanto ao uso, finalidade, conservação, higienização e responsabilidade sobre os equipamentos entregues, estando ciente de que o não uso ou uso inadequado dos EPIs poderá expor minha integridade física e contrariar as normas internas de segurança e saúde no trabalho.</textarea>
+Declaro ainda ter recebido orientação quanto ao uso, finalidade, conservação, higienização e responsabilidade sobre os equipamentos entregues.</textarea>
 </div>
 
 <div class="card">
@@ -180,276 +88,222 @@ Declaro ainda ter recebido orientação quanto ao uso, finalidade, conservação
 <button class="btn3" onclick="limpar('assResp')">LIMPAR ASSINATURA DO RESPONSÁVEL</button>
 </div>
 
+<button onclick="salvarNoSupabase()">SALVAR NO PAINEL GLOBALLED</button>
 <button onclick="gerarPDF()">GERAR PDF DA FICHA DE EPI</button>
 <button class="btn2" onclick="enviarWhatsApp()">ENVIAR RESUMO PELO WHATSAPP</button>
 
 <div id="areaPDF" style="display:none"></div>
-
 </div>
 
 <script>
+const SUPABASE_URL = "https://cujjdzfhicinarumphjq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_XYp2Y75G8UTgMskNVfM3GA_Ybzrh9Fi";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let clientes = [];
+
+async function carregarClientes(){
+ const {data,error}=await db.from("clientes").select("*").order("empresa");
+ if(error){ alert("Erro ao carregar clientes: " + error.message); return; }
+ clientes=data||[];
+ clienteSelect.innerHTML='<option value="">Selecione o cliente</option>';
+ clientes.forEach(c=>{
+  clienteSelect.innerHTML += `<option value="${c.id}">${c.empresa}</option>`;
+ });
+}
+carregarClientes();
+
+function preencherCliente(){
+ const c=clientes.find(x=>x.id===clienteSelect.value);
+ if(!c) return;
+ empresa.value=c.empresa||"";
+ cnpj.value=c.cnpj||"";
+}
+
 const listaEPIs=[
-"Capacete de segurança",
-"Óculos de proteção",
-"Protetor auricular",
-"Respirador PFF2",
-"Respirador semifacial",
-"Luva nitrílica",
-"Luva de vaqueta",
-"Luva pigmentada",
-"Botina de segurança",
-"Cinturão paraquedista NR-35",
-"Talabarte",
-"Trava-quedas",
-"Creme de proteção",
-"Avental de raspa",
-"Perneira",
-"Máscara facial",
-"Protetor solar",
-"Outro"
+"Capacete de segurança","Óculos de proteção","Protetor auricular","Respirador PFF2",
+"Respirador semifacial","Luva nitrílica","Luva de vaqueta","Luva pigmentada",
+"Botina de segurança","Cinturão paraquedista NR-35","Talabarte","Trava-quedas",
+"Creme de proteção","Avental de raspa","Perneira","Máscara facial","Protetor solar","Outro"
 ];
 
-function mascaraCPF(campo){
-let v=campo.value.replace(/\D/g,"");
-v=v.replace(/(\d{3})(\d)/,"$1.$2");
-v=v.replace(/(\d{3})(\d)/,"$1.$2");
-v=v.replace(/(\d{3})(\d{1,2})$/,"$1-$2");
-campo.value=v;
-}
-
-function mascaraCNPJ(campo){
-let v=campo.value.replace(/\D/g,"");
-v=v.replace(/^(\d{2})(\d)/,"$1.$2");
-v=v.replace(/^(\d{2})\.(\d{3})(\d)/,"$1.$2.$3");
-v=v.replace(/\.(\d{3})(\d)/,".$1/$2");
-v=v.replace(/(\d{4})(\d)/,"$1-$2");
-campo.value=v;
-}
-
 let total=0;
-
 function addEPI(){
-total++;
-let opcoes=listaEPIs.map(e=>`<option>${e}</option>`).join("");
-let div=document.createElement("div");
-div.className="epi";
-div.innerHTML=`
-<h3>EPI ${total}</h3>
-
-<label>Equipamento</label>
-<select class="nomeEPI">${opcoes}</select>
-
-<label>Descrição complementar</label>
-<input class="descEPI" placeholder="Modelo, tamanho ou observação">
-
-<label>Fabricante</label>
-<input class="fabricante" placeholder="Fabricante">
-
-<label>CA</label>
-<input class="ca" placeholder="Certificado de Aprovação">
-
-<label>Validade do CA</label>
-<input class="validadeCA" type="date">
-
-<label>Quantidade</label>
-<input class="qtd" placeholder="Quantidade">
-
-<label>Data de entrega</label>
-<input class="dataEntrega" type="date">
-`;
-document.getElementById("epis").appendChild(div);
+ total++;
+ let opcoes=listaEPIs.map(e=>`<option>${e}</option>`).join("");
+ let div=document.createElement("div");
+ div.className="epi";
+ div.innerHTML=`
+ <h3>EPI ${total}</h3>
+ <label>Equipamento</label>
+ <select class="nomeEPI">${opcoes}</select>
+ <label>Descrição complementar</label>
+ <input class="descEPI" placeholder="Modelo, tamanho ou observação">
+ <label>Fabricante</label>
+ <input class="fabricante" placeholder="Fabricante">
+ <label>CA</label>
+ <input class="ca" placeholder="Certificado de Aprovação">
+ <label>Validade do CA</label>
+ <input class="validadeCA" type="date">
+ <label>Quantidade</label>
+ <input class="qtd" placeholder="Quantidade">
+ <label>Data de entrega</label>
+ <input class="dataEntrega" type="date">
+ `;
+ epis.appendChild(div);
 }
-
 addEPI();
 
 function prepararCanvas(id){
-const c=document.getElementById(id);
-const ctx=c.getContext("2d");
-
-function resize(){
-const img=ctx.getImageData(0,0,c.width,c.height);
-c.width=c.offsetWidth;
-c.height=160;
-try{ctx.putImageData(img,0,0)}catch(e){}
-ctx.lineWidth=2;
-ctx.lineCap="round";
-ctx.strokeStyle="#000";
+ const c=document.getElementById(id);
+ const ctx=c.getContext("2d");
+ function resize(){
+  c.width=c.offsetWidth;
+  c.height=160;
+  ctx.lineWidth=2;
+  ctx.lineCap="round";
+  ctx.strokeStyle="#000";
+ }
+ setTimeout(resize,300);
+ window.addEventListener("resize",resize);
+ let draw=false;
+ function pos(e){
+  let r=c.getBoundingClientRect();
+  let t=e.touches?e.touches[0]:e;
+  return{x:t.clientX-r.left,y:t.clientY-r.top};
+ }
+ c.addEventListener("mousedown",e=>{draw=true;let p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y)});
+ c.addEventListener("mousemove",e=>{if(!draw)return;let p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke()});
+ c.addEventListener("mouseup",()=>draw=false);
+ c.addEventListener("mouseleave",()=>draw=false);
+ c.addEventListener("touchstart",e=>{draw=true;let p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault()});
+ c.addEventListener("touchmove",e=>{if(!draw)return;let p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();e.preventDefault()});
+ c.addEventListener("touchend",()=>draw=false);
 }
-
-setTimeout(resize,300);
-window.addEventListener("resize",resize);
-
-let draw=false;
-
-function pos(e){
-let r=c.getBoundingClientRect();
-let touch=e.touches?e.touches[0]:e;
-return{
-x:touch.clientX-r.left,
-y:touch.clientY-r.top
-};
-}
-
-c.addEventListener("mousedown",e=>{
-draw=true;
-let p=pos(e);
-ctx.beginPath();
-ctx.moveTo(p.x,p.y);
-});
-
-c.addEventListener("mousemove",e=>{
-if(!draw)return;
-let p=pos(e);
-ctx.lineTo(p.x,p.y);
-ctx.stroke();
-});
-
-c.addEventListener("mouseup",()=>draw=false);
-c.addEventListener("mouseleave",()=>draw=false);
-
-c.addEventListener("touchstart",e=>{
-draw=true;
-let p=pos(e);
-ctx.beginPath();
-ctx.moveTo(p.x,p.y);
-e.preventDefault();
-});
-
-c.addEventListener("touchmove",e=>{
-if(!draw)return;
-let p=pos(e);
-ctx.lineTo(p.x,p.y);
-ctx.stroke();
-e.preventDefault();
-});
-
-c.addEventListener("touchend",()=>draw=false);
-}
-
 prepararCanvas("assColab");
 prepararCanvas("assResp");
 
 function limpar(id){
-let c=document.getElementById(id);
-c.getContext("2d").clearRect(0,0,c.width,c.height);
+ let c=document.getElementById(id);
+ c.getContext("2d").clearRect(0,0,c.width,c.height);
+}
+
+function primeiroEPI(){
+ const e=document.querySelector(".epi");
+ if(!e) return {};
+ return {
+  epi:e.querySelector(".nomeEPI").value,
+  ca:e.querySelector(".ca").value,
+  qtd:parseInt(e.querySelector(".qtd").value||0)
+ };
+}
+
+async function salvarNoSupabase(){
+ const p=primeiroEPI();
+
+ const {error}=await db.from("fichas_epi").insert({
+  cliente_id: clienteSelect.value || null,
+  colaborador: colaborador.value,
+  cpf: cpf.value,
+  funcao: funcao.value,
+  epi: p.epi,
+  ca: p.ca,
+  quantidade: p.qtd,
+  assinatura: "assinatura registrada digitalmente"
+ });
+
+ if(error){
+  alert("Erro ao salvar: " + error.message);
+  return;
+ }
+
+ alert("Ficha EPI salva no painel GLOBALLED!");
 }
 
 async function gerarPDF(){
-const {jsPDF}=window.jspdf;
+ const {jsPDF}=window.jspdf;
+ let linhas="";
+ document.querySelectorAll(".epi").forEach((e,i)=>{
+  linhas+=`
+  <tr>
+  <td>${i+1}</td>
+  <td>${e.querySelector(".nomeEPI").value}</td>
+  <td>${e.querySelector(".descEPI").value}</td>
+  <td>${e.querySelector(".fabricante").value}</td>
+  <td>${e.querySelector(".ca").value}</td>
+  <td>${e.querySelector(".validadeCA").value}</td>
+  <td>${e.querySelector(".qtd").value}</td>
+  <td>${e.querySelector(".dataEntrega").value}</td>
+  </tr>`;
+ });
 
-let epis=document.querySelectorAll(".epi");
-let linhas="";
+ let hoje=new Date().toLocaleString("pt-BR");
+ let ass1=assColab.toDataURL();
+ let ass2=assResp.toDataURL();
 
-epis.forEach((e,i)=>{
-linhas+=`
-<tr>
-<td>${i+1}</td>
-<td>${e.querySelector(".nomeEPI").value}</td>
-<td>${e.querySelector(".descEPI").value}</td>
-<td>${e.querySelector(".fabricante").value}</td>
-<td>${e.querySelector(".ca").value}</td>
-<td>${e.querySelector(".validadeCA").value}</td>
-<td>${e.querySelector(".qtd").value}</td>
-<td>${e.querySelector(".dataEntrega").value}</td>
-</tr>`;
-});
+ areaPDF.style.display="block";
+ areaPDF.innerHTML=`
+ <div class="pdf" id="pdfFinal">
+ <img src="https://globalledsst.com.br/img/logo.png" style="max-width:110px;display:block;margin:0 auto 10px">
+ <h1>FICHA DE ENTREGA DE EPI</h1>
+ <h2>GLOBALLED SST</h2>
+ <p><b>Data de geração:</b> ${hoje}</p>
+ <h2>Dados da Empresa</h2>
+ <p><b>Empresa:</b> ${empresa.value}</p>
+ <p><b>CNPJ:</b> ${cnpj.value}</p>
+ <p><b>Unidade / Local:</b> ${unidade.value}</p>
+ <h2>Dados do Colaborador</h2>
+ <p><b>Colaborador:</b> ${colaborador.value}</p>
+ <p><b>CPF:</b> ${cpf.value}</p>
+ <p><b>Função:</b> ${funcao.value}</p>
+ <p><b>Setor:</b> ${setor.value}</p>
+ <h2>EPIs Entregues</h2>
+ <table border="1" width="100%" cellspacing="0" cellpadding="5" style="font-size:11px;">
+ <tr><th>Nº</th><th>EPI</th><th>Descrição</th><th>Fabricante</th><th>CA</th><th>Validade CA</th><th>Qtd</th><th>Entrega</th></tr>
+ ${linhas}
+ </table>
+ <h2>Termo de Responsabilidade</h2>
+ <p style="text-align:justify;white-space:pre-line;">${termo.value}</p>
+ <h2>Assinaturas</h2>
+ <p><b>Assinatura do Colaborador:</b></p>
+ <img src="${ass1}" style="width:320px;border:1px solid #ccc">
+ <p><b>Assinatura do Responsável:</b></p>
+ <img src="${ass2}" style="width:320px;border:1px solid #ccc">
+ <p class="small">Documento gerado digitalmente pelo sistema Ficha Digital de EPI GLOBALLED SST.</p>
+ </div>`;
 
-let hoje=new Date().toLocaleString("pt-BR");
-let ass1=document.getElementById("assColab").toDataURL();
-let ass2=document.getElementById("assResp").toDataURL();
+ let el=document.getElementById("pdfFinal");
+ let canvasPDF=await html2canvas(el,{scale:2,useCORS:true});
+ let img=canvasPDF.toDataURL("image/png");
+ let pdf=new jsPDF("p","mm","a4");
+ let largura=210;
+ let altura=canvasPDF.height*largura/canvasPDF.width;
 
-areaPDF.style.display="block";
-
-areaPDF.innerHTML=`
-<div class="pdf" id="pdfFinal">
-
-<img class="pdf-logo" src="https://globalledsst.com.br/img/logo.png">
-
-<h1>FICHA DE ENTREGA DE EPI</h1>
-<h2>GLOBALLED SST</h2>
-
-<p><b>Data de geração:</b> ${hoje}</p>
-
-<h2>Dados da Empresa</h2>
-<p><b>Empresa:</b> ${empresa.value}</p>
-<p><b>CNPJ:</b> ${cnpj.value}</p>
-<p><b>Unidade / Local:</b> ${unidade.value}</p>
-
-<h2>Dados do Colaborador</h2>
-<p><b>Colaborador:</b> ${colaborador.value}</p>
-<p><b>CPF:</b> ${cpf.value}</p>
-<p><b>Função:</b> ${funcao.value}</p>
-<p><b>Setor:</b> ${setor.value}</p>
-
-<h2>EPIs Entregues</h2>
-<table border="1" width="100%" cellspacing="0" cellpadding="5" style="font-size:11px;">
-<tr>
-<th>Nº</th>
-<th>EPI</th>
-<th>Descrição</th>
-<th>Fabricante</th>
-<th>CA</th>
-<th>Validade CA</th>
-<th>Qtd</th>
-<th>Entrega</th>
-</tr>
-${linhas}
-</table>
-
-<h2>Termo de Responsabilidade</h2>
-<p style="text-align:justify;white-space:pre-line;">${termo.value}</p>
-
-<h2>Assinaturas</h2>
-
-<p><b>Assinatura do Colaborador:</b></p>
-<img src="${ass1}" style="width:320px;border:1px solid #ccc">
-
-<p><b>Assinatura do Responsável:</b></p>
-<img src="${ass2}" style="width:320px;border:1px solid #ccc">
-
-<p class="small">
-Documento gerado digitalmente pelo sistema Ficha Digital de EPI GLOBALLED SST.
-Este registro não substitui a obrigação da empresa contratante de manter controle documental conforme sua gestão interna de SST.
-</p>
-
-</div>
-`;
-
-let el=document.getElementById("pdfFinal");
-let canvasPDF=await html2canvas(el,{scale:2,useCORS:true});
-let img=canvasPDF.toDataURL("image/png");
-
-let pdf=new jsPDF("p","mm","a4");
-let largura=210;
-let altura=canvasPDF.height*largura/canvasPDF.width;
-
-if(altura<=297){
-pdf.addImage(img,"PNG",0,0,largura,altura);
-}else{
-let pos=0;
-let pageHeight=297;
-while(pos<altura){
-pdf.addImage(img,"PNG",0,-pos,largura,altura);
-pos+=pageHeight;
-if(pos<altura) pdf.addPage();
-}
-}
-
-pdf.save("Ficha-Digital-EPI-Globalled.pdf");
+ if(altura<=297){
+  pdf.addImage(img,"PNG",0,0,largura,altura);
+ }else{
+  let pos=0;
+  while(pos<altura){
+   pdf.addImage(img,"PNG",0,-pos,largura,altura);
+   pos+=297;
+   if(pos<altura) pdf.addPage();
+  }
+ }
+ pdf.save("Ficha-Digital-EPI-Globalled.pdf");
 }
 
 function enviarWhatsApp(){
-let msg=
-`FICHA DIGITAL DE EPI GLOBALLED SST%0A%0A`+
-`Empresa: ${empresa.value}%0A`+
-`Colaborador: ${colaborador.value}%0A`+
-`CPF: ${cpf.value}%0A`+
-`Função: ${funcao.value}%0A`+
-`Setor: ${setor.value}%0A`+
-`Data: ${new Date().toLocaleString("pt-BR")}%0A%0A`+
-`Registro criado pelo sistema Ficha Digital de EPI.`;
+ let msg=
+ `FICHA DIGITAL DE EPI GLOBALLED SST%0A%0A`+
+ `Empresa: ${empresa.value}%0A`+
+ `Colaborador: ${colaborador.value}%0A`+
+ `CPF: ${cpf.value}%0A`+
+ `Função: ${funcao.value}%0A`+
+ `Setor: ${setor.value}%0A`+
+ `Data: ${new Date().toLocaleString("pt-BR")}%0A%0A`+
+ `Registro criado pelo sistema Ficha Digital de EPI.`;
 
-window.open(`https://wa.me/551433224141?text=${msg}`,"_blank");
+ window.open(`https://wa.me/551433224141?text=${msg}`,"_blank");
 }
 </script>
 
